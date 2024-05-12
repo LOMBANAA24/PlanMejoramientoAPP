@@ -1,5 +1,6 @@
-// loggerMiddleware.js
+// middlewares/loggerMiddleware.js
+
 exports.logRequest = (req, res, next) => {
-    console.log(`${req.method} ${req.originalUrl} - ${new Date()}`);
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
     next();
 };

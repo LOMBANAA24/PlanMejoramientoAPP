@@ -1,55 +1,57 @@
-const Moto = require('../models/Moto');
+// MotocicletaController.js
+const Motocicleta = require('../models/Motocicleta');
 
 exports.getMotos = async (req, res) => {
-    Moto.getAll((err, data) => {
+    Motocicleta.find({}, (err, motos) => {
         if (err) {
             res.status(500).send({
                 message: err.message || "Some error occurred while retrieving motorcycles."
             });
         } else {
-            res.send(data);
+            res.send(motos);
         }
     });
 };
 
 exports.getMoto = async (req, res) => {
-    Moto.getById(req.params.id, (err, data) => {
+    Motocicleta.findById(req.params.id, (err, moto) => {
         if (err) {
             res.status(500).send({
                 message: err.message || "Some error occurred while retrieving the motorcycle."
             });
         } else {
-            res.send(data);
+            res.send(moto);
         }
     });
 };
 
 exports.createMoto = async (req, res) => {
-    Moto.create(req.body, (err, data) => {
+    const newMoto = new Motocicleta(req.body);
+    newMoto.save((err, moto) => {
         if (err) {
             res.status(500).send({
                 message: err.message || "Some error occurred while creating the motorcycle."
             });
         } else {
-            res.send(data);
+            res.send(moto);
         }
     });
 };
 
 exports.updateMoto = async (req, res) => {
-    Moto.update(req.params.id, req.body, (err, data) => {
+    Motocicleta.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, moto) => {
         if (err) {
             res.status(500).send({
                 message: err.message || "Some error occurred while updating the motorcycle."
             });
         } else {
-            res.send(data);
+            res.send(moto);
         }
     });
 };
 
 exports.deleteMoto = async (req, res) => {
-    Moto.delete(req.params.id, (err, data) => {
+    Motocicleta.findByIdAndRemove(req.params.id, (err, moto) => {
         if (err) {
             res.status(500).send({
                 message: err.message || "Some error occurred while deleting the motorcycle."

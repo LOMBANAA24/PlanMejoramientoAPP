@@ -15,3 +15,5 @@ app.get("/", (req, res) => {
 connectDB();
 
 app.listen(port, () => console.log("Servidor corriendo en puerto", port));
+
+//192.168.0.103:8081:3000

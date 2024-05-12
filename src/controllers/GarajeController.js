@@ -1,20 +1,62 @@
-// GarajeController.js
 const Garaje = require('../models/Garaje');
 
-// Controlador para crear un garaje
-exports.crearGaraje = async (req, res) => {
-  try {
-    const { nombre, direccion } = req.body;
-    if (!nombre || !direccion) {
-      return res.status(400).send('Se requiere nombre y dirección');
-    }
-    const garaje = new Garaje({ nombre, direccion });
-    await garaje.save();
-    res.send(garaje);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Hubo un error al crear el garaje');
-  }
+exports.getGarajes = async (req, res) => {
+    Garaje.find({}, (err, garajes) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while retrieving garages."
+            });
+        } else {
+            res.send(garajes);
+        }
+    });
 };
 
-// Otros controladores para actualizar y eliminar garajes
+exports.getGaraje = async (req, res) => {
+    Garaje.findById(req.params.id, (err, garaje) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while retrieving the garage."
+            });
+        } else {
+            res.send(garaje);
+        }
+    });
+};
+
+exports.createGaraje = async (req, res) => {
+    const newGaraje = new Garaje(req.body);
+    newGaraje.save((err, garaje) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while creating the garage."
+            });
+        } else {
+            res.send(garaje);
+        }
+    });
+};
+
+exports.updateGaraje = async (req, res) => {
+    Garaje.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, garaje) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while updating the garage."
+            });
+        } else {
+            res.send(garaje);
+        }
+    });
+};
+
+exports.deleteGaraje = async (req, res) => {
+    Garaje.findByIdAndRemove(req.params.id, (err, garaje) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while deleting the garage."
+            });
+        } else {
+            res.send({ message: "Garage was deleted successfully!" });
+        }
+    });
+};

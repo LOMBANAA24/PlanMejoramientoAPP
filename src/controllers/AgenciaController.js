@@ -1,29 +1,62 @@
-// AgenciaController.js
 const Agencia = require('../models/Agencia');
 
-// Controlador para obtener todas las agencias
-exports.obtenerAgencias = async (req, res) => {
-  try {
-    const agencias = await Agencia.find();
-    res.send(agencias);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Hubo un error al obtener las agencias');
-  }
+exports.getAgencias = async (req, res) => {
+    Agencia.find({}, (err, agencias) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while retrieving agencies."
+            });
+        } else {
+            res.send(agencias);
+        }
+    });
 };
 
-// Controlador para obtener una agencia por ID
-exports.obtenerAgenciaPorId = async (req, res) => {
-  try {
-    const agencia = await Agencia.findById(req.params.id);
-    if (!agencia) {
-      return res.status(404).send('Agencia no encontrada');
-    }
-    res.send(agencia);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Hubo un error al obtener la agencia');
-  }
+exports.getAgencia = async (req, res) => {
+    Agencia.findById(req.params.id, (err, agencia) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while retrieving the agency."
+            });
+        } else {
+            res.send(agencia);
+        }
+    });
 };
 
-// Otros controladores para actualizar y eliminar agencias
+exports.createAgencia = async (req, res) => {
+    const newAgencia = new Agencia(req.body);
+    newAgencia.save((err, agencia) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while creating the agency."
+            });
+        } else {
+            res.send(agencia);
+        }
+    });
+};
+
+exports.updateAgencia = async (req, res) => {
+    Agencia.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, agencia) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while updating the agency."
+            });
+        } else {
+            res.send(agencia);
+        }
+    });
+};
+
+exports.deleteAgencia = async (req, res) => {
+    Agencia.findByIdAndRemove(req.params.id, (err, agencia) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while deleting the agency."
+            });
+        } else {
+            res.send({ message: "Agency was deleted successfully!" });
+        }
+    });
+};

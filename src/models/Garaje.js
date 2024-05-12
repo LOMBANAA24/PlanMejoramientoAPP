@@ -1,45 +1,61 @@
-// Garaje.js
-const mongoose = require('mongoose');
+const Garaje = require('../models/Garaje');
 
-const GarajeSchema = new mongoose.Schema({
-  nombre: {
-    type: String,
-    required: true,
-    minlength: 2, // Longitud mínima del nombre
-    maxlength: 50, // Longitud máxima del nombre
-  },
-  direccion: {
-    calle: {
-      type: String,
-      required: true,
-      minlength: 2, // Longitud mínima de la calle
-      maxlength: 100, // Longitud máxima de la calle
-    },
-    numero: {
-      type: String,
-      required: true,
-      minlength: 1, // Longitud mínima del número
-      maxlength: 10, // Longitud máxima del número
-    },
-    ciudad: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Ciudad',
-    }
-  },
-  capacidad: {
-    type: Number,
-    min: 1, // Capacidad mínima
-    max: 100, // Capacidad máxima
-  },
-  espacio: {
-    type: Number,
-    min: 1, // Espacio mínimo
-    max: 1000, // Espacio máximo
-  },
-  agencia: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Agencia',
-  }
-});
+exports.getGarajes = async (req, res) => {
+    Garaje.getAll((err, data) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while retrieving garages."
+            });
+        } else {
+            res.send(data);
+        }
+    });
+};
 
-module.exports = mongoose.model('Garaje', GarajeSchema);
+exports.getGaraje = async (req, res) => {
+    Garaje.getById(req.params.id, (err, data) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while retrieving the garage."
+            });
+        } else {
+            res.send(data);
+        }
+    });
+};
+
+exports.createGaraje = async (req, res) => {
+    Garaje.create(req.body, (err, data) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while creating the garage."
+            });
+        } else {
+            res.send(data);
+        }
+    });
+};
+
+exports.updateGaraje = async (req, res) => {
+    Garaje.update(req.params.id, req.body, (err, data) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while updating the garage."
+            });
+        } else {
+            res.send(data);
+        }
+    });
+};
+
+exports.deleteGaraje = async (req, res) => {
+    Garaje.delete(req.params.id, (err, data) => {
+        if (err) {
+            res.status(500).send({
+                message: err.message || "Some error occurred while deleting the garage."
+            });
+        } else {
+            res.send({ message: "Garage was deleted successfully!" });
+        }
+    });
+};

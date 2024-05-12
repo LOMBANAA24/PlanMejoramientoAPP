@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const motoController = require('../controllers/MotoController');
+const motocicletaController = require('../controllers/MotocicletaController');
 
-router.get('/', motoController.getMotos);
-router.get('/:id', motoController.getMoto);
-router.post('/', motoController.createMoto);
-router.put('/:id', motoController.updateMoto);
-router.delete('/:id', motoController.deleteMoto);
+router.get('/', motocicletaController.getMotocicletas);
+router.get('/:id', motocicletaController.getMotocicleta);
+router.post('/', motocicletaController.createMotocicleta);
+router.put('/:id', motocicletaController.updateMotocicleta);
+router.delete('/:id', motocicletaController.deleteMotocicleta);
 
 module.exports = router;

@@ -9,7 +9,6 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME,
     authPlugins: {
         mysql_clear_password: () => Buffer.from(process.env.DB_PASSWORD, 'utf-8'),
-        caching_sha2_password: true,
     }
 });
 

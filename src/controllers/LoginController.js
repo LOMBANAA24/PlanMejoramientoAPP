@@ -1,5 +1,5 @@
-// LoginController.js
 const jwt = require('jsonwebtoken');
+const { validationResult } = require('express-validator');
 const Autenticacion = require('../models/Autenticacion');
 const Administrador = require('../models/Administrador');
 

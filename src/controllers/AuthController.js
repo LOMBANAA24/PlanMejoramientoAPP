@@ -1,4 +1,4 @@
-// AuthController.js
+const { validationResult } = require('express-validator');
 const Autenticacion = require('../models/Autenticacion');
 
 exports.getAutenticacion = async (req, res) => {

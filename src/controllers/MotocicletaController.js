@@ -1,4 +1,4 @@
-// MotocicletaController.js
+const { validationResult } = require('express-validator');
 const Motocicleta = require('../models/Motocicleta');
 
 exports.getMotos = async (req, res) => {
@@ -26,6 +26,12 @@ exports.getMoto = async (req, res) => {
 };
 
 exports.createMoto = async (req, res) => {
+    // Validar los datos de entrada
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     const newMoto = new Motocicleta(req.body);
     newMoto.save((err, moto) => {
         if (err) {
@@ -39,6 +45,12 @@ exports.createMoto = async (req, res) => {
 };
 
 exports.updateMoto = async (req, res) => {
+    // Validar los datos de entrada
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     Motocicleta.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, moto) => {
         if (err) {
             res.status(500).send({

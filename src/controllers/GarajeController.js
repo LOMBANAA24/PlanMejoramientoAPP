@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator');
 const Garaje = require('../models/Garaje');
 
 exports.getGarajes = async (req, res) => {
@@ -25,6 +26,12 @@ exports.getGaraje = async (req, res) => {
 };
 
 exports.createGaraje = async (req, res) => {
+    // Validar los datos de entrada
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     const newGaraje = new Garaje(req.body);
     newGaraje.save((err, garaje) => {
         if (err) {
@@ -38,6 +45,12 @@ exports.createGaraje = async (req, res) => {
 };
 
 exports.updateGaraje = async (req, res) => {
+    // Validar los datos de entrada
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     Garaje.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, garaje) => {
         if (err) {
             res.status(500).send({

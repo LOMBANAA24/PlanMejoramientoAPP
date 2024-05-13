@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator');
 const Reserva = require('../models/Reserva');
 
 exports.getReservas = async (req, res) => {
@@ -25,6 +26,12 @@ exports.getReserva = async (req, res) => {
 };
 
 exports.createReserva = async (req, res) => {
+    // Validar los datos de entrada
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     const newReserva = new Reserva(req.body);
     newReserva.save((err, reserva) => {
         if (err) {
@@ -38,6 +45,12 @@ exports.createReserva = async (req, res) => {
 };
 
 exports.updateReserva = async (req, res) => {
+    // Validar los datos de entrada
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     Reserva.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, reserva) => {
         if (err) {
             res.status(500).send({

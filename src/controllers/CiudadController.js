@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator');
 const Ciudad = require('../models/Ciudad');
 
 exports.getCiudades = async (req, res) => {
@@ -25,6 +26,12 @@ exports.getCiudad = async (req, res) => {
 };
 
 exports.createCiudad = async (req, res) => {
+    // Validar los datos de entrada
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     const newCiudad = new Ciudad(req.body);
     newCiudad.save((err, ciudad) => {
         if (err) {
@@ -38,6 +45,12 @@ exports.createCiudad = async (req, res) => {
 };
 
 exports.updateCiudad = async (req, res) => {
+    // Validar los datos de entrada
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     Ciudad.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, ciudad) => {
         if (err) {
             res.status(500).send({

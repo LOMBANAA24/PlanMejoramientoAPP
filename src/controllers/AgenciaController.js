@@ -1,3 +1,4 @@
+const { validationResult } = require('express-validator');
 const Agencia = require('../models/Agencia');
 
 exports.getAgencias = async (req, res) => {
@@ -25,6 +26,12 @@ exports.getAgencia = async (req, res) => {
 };
 
 exports.createAgencia = async (req, res) => {
+    // Validar los datos de entrada
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     const newAgencia = new Agencia(req.body);
     newAgencia.save((err, agencia) => {
         if (err) {
@@ -38,6 +45,12 @@ exports.createAgencia = async (req, res) => {
 };
 
 exports.updateAgencia = async (req, res) => {
+    // Validar los datos de entrada
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     Agencia.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, agencia) => {
         if (err) {
             res.status(500).send({

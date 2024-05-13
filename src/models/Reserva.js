@@ -1,61 +1,70 @@
-const Reserva = require('../models/Reserva');
+const db = require('../config/database');
 
-exports.getReservas = async (req, res) => {
-    Reserva.getAll((err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving reservations."
-            });
-        } else {
-            res.send(data);
-        }
-    });
+const Reserva = {
+    getAll: (result) => {
+        db.query('SELECT * FROM reservas', (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            result(null, res);
+        });
+    },
+
+    getById: (id, result) => {
+        db.query('SELECT * FROM reservas WHERE ID_Reserva = ?', id, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            if (res.length) {
+                result(null, res[0]);
+                return;
+            }
+            // Not found Reserva with the id
+            result({ kind: "not_found" }, null);
+        });
+    },
+
+    create: (newReserva, result) => {
+        db.query('INSERT INTO reservas SET ?', newReserva, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            result(null, { id: res.insertId, ...newReserva });
+        });
+    },
+
+    update: (id, reserva, result) => {
+        db.query('UPDATE reservas SET ? WHERE ID_Reserva = ?', [reserva, id], (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            if (res.affectedRows == 0) {
+                // Not found Reserva with the id
+                result({ kind: "not_found" }, null);
+                return;
+            }
+            result(null, { id: id, ...reserva });
+        });
+    },
+
+    delete: (id, result) => {
+        db.query('DELETE FROM reservas WHERE ID_Reserva = ?', id, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            if (res.affectedRows == 0) {
+                // Not found Reserva with the id
+                result({ kind: "not_found" }, null);
+                return;
+            }
+            result(null, res);
+        });
+    }
 };
 
-exports.getReserva = async (req, res) => {
-    Reserva.getById(req.params.id, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving the reservation."
-            });
-        } else {
-            res.send(data);
-        }
-    });
-};
-
-exports.createReserva = async (req, res) => {
-    Reserva.create(req.body, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while creating the reservation."
-            });
-        } else {
-            res.send(data);
-        }
-    });
-};
-
-exports.updateReserva = async (req, res) => {
-    Reserva.update(req.params.id, req.body, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while updating the reservation."
-            });
-        } else {
-            res.send(data);
-        }
-    });
-};
-
-exports.deleteReserva = async (req, res) => {
-    Reserva.delete(req.params.id, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while deleting the reservation."
-            });
-        } else {
-            res.send({ message: "Reservation was deleted successfully!" });
-        }
-    });
-};
+module.exports = Reserva;

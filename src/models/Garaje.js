@@ -1,61 +1,70 @@
-const Garaje = require('../models/Garaje');
+const db = require('../config/database');
 
-exports.getGarajes = async (req, res) => {
-    Garaje.getAll((err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving garages."
-            });
-        } else {
-            res.send(data);
-        }
-    });
+const Garaje = {
+    getAll: (result) => {
+        db.query('SELECT * FROM garajes', (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            result(null, res);
+        });
+    },
+
+    getById: (id, result) => {
+        db.query('SELECT * FROM garajes WHERE ID_Garaje = ?', id, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            if (res.length) {
+                result(null, res[0]);
+                return;
+            }
+            // Not found Garaje with the id
+            result({ kind: "not_found" }, null);
+        });
+    },
+
+    create: (newGaraje, result) => {
+        db.query('INSERT INTO garajes SET ?', newGaraje, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            result(null, { id: res.insertId, ...newGaraje });
+        });
+    },
+
+    update: (id, garaje, result) => {
+        db.query('UPDATE garajes SET ? WHERE ID_Garaje = ?', [garaje, id], (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            if (res.affectedRows == 0) {
+                // Not found Garaje with the id
+                result({ kind: "not_found" }, null);
+                return;
+            }
+            result(null, { id: id, ...garaje });
+        });
+    },
+
+    delete: (id, result) => {
+        db.query('DELETE FROM garajes WHERE ID_Garaje = ?', id, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            if (res.affectedRows == 0) {
+                // Not found Garaje with the id
+                result({ kind: "not_found" }, null);
+                return;
+            }
+            result(null, res);
+        });
+    }
 };
 
-exports.getGaraje = async (req, res) => {
-    Garaje.getById(req.params.id, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving the garage."
-            });
-        } else {
-            res.send(data);
-        }
-    });
-};
-
-exports.createGaraje = async (req, res) => {
-    Garaje.create(req.body, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while creating the garage."
-            });
-        } else {
-            res.send(data);
-        }
-    });
-};
-
-exports.updateGaraje = async (req, res) => {
-    Garaje.update(req.params.id, req.body, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while updating the garage."
-            });
-        } else {
-            res.send(data);
-        }
-    });
-};
-
-exports.deleteGaraje = async (req, res) => {
-    Garaje.delete(req.params.id, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while deleting the garage."
-            });
-        } else {
-            res.send({ message: "Garage was deleted successfully!" });
-        }
-    });
-};
+module.exports = Garaje;

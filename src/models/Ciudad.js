@@ -1,61 +1,70 @@
-const Ciudad = require('../models/Ciudad');
+const db = require('../config/database');
 
-exports.getCiudades = async (req, res) => {
-    Ciudad.getAll((err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving cities."
-            });
-        } else {
-            res.send(data);
-        }
-    });
+const Ciudad = {
+    getAll: (result) => {
+        db.query('SELECT * FROM ciudades', (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            result(null, res);
+        });
+    },
+
+    getById: (id, result) => {
+        db.query('SELECT * FROM ciudades WHERE ID_Ciudad = ?', id, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            if (res.length) {
+                result(null, res[0]);
+                return;
+            }
+            // Not found Ciudad with the id
+            result({ kind: "not_found" }, null);
+        });
+    },
+
+    create: (newCiudad, result) => {
+        db.query('INSERT INTO ciudades SET ?', newCiudad, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            result(null, { id: res.insertId, ...newCiudad });
+        });
+    },
+
+    update: (id, ciudad, result) => {
+        db.query('UPDATE ciudades SET ? WHERE ID_Ciudad = ?', [ciudad, id], (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            if (res.affectedRows == 0) {
+                // Not found Ciudad with the id
+                result({ kind: "not_found" }, null);
+                return;
+            }
+            result(null, { id: id, ...ciudad });
+        });
+    },
+
+    delete: (id, result) => {
+        db.query('DELETE FROM ciudades WHERE ID_Ciudad = ?', id, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            if (res.affectedRows == 0) {
+                // Not found Ciudad with the id
+                result({ kind: "not_found" }, null);
+                return;
+            }
+            result(null, res);
+        });
+    }
 };
 
-exports.getCiudad = async (req, res) => {
-    Ciudad.getById(req.params.id, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving the city."
-            });
-        } else {
-            res.send(data);
-        }
-    });
-};
-
-exports.createCiudad = async (req, res) => {
-    Ciudad.create(req.body, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while creating the city."
-            });
-        } else {
-            res.send(data);
-        }
-    });
-};
-
-exports.updateCiudad = async (req, res) => {
-    Ciudad.update(req.params.id, req.body, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while updating the city."
-            });
-        } else {
-            res.send(data);
-        }
-    });
-};
-
-exports.deleteCiudad = async (req, res) => {
-    Ciudad.delete(req.params.id, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while deleting the city."
-            });
-        } else {
-            res.send({ message: "City was deleted successfully!" });
-        }
-    });
-};
+module.exports = Ciudad;

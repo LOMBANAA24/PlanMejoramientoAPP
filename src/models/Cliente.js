@@ -1,61 +1,70 @@
-const Cliente = require('../models/Cliente');
+const db = require('../config/database');
 
-exports.getClientes = async (req, res) => {
-    Cliente.getAll((err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving clients."
-            });
-        } else {
-            res.send(data);
-        }
-    });
+const Cliente = {
+    getAll: (result) => {
+        db.query('SELECT * FROM clientes', (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            result(null, res);
+        });
+    },
+
+    getById: (id, result) => {
+        db.query('SELECT * FROM clientes WHERE ID_Cliente = ?', id, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            if (res.length) {
+                result(null, res[0]);
+                return;
+            }
+            // Not found Cliente with the id
+            result({ kind: "not_found" }, null);
+        });
+    },
+
+    create: (newCliente, result) => {
+        db.query('INSERT INTO clientes SET ?', newCliente, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            result(null, { id: res.insertId, ...newCliente });
+        });
+    },
+
+    update: (id, cliente, result) => {
+        db.query('UPDATE clientes SET ? WHERE ID_Cliente = ?', [cliente, id], (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            if (res.affectedRows == 0) {
+                // Not found Cliente with the id
+                result({ kind: "not_found" }, null);
+                return;
+            }
+            result(null, { id: id, ...cliente });
+        });
+    },
+
+    delete: (id, result) => {
+        db.query('DELETE FROM clientes WHERE ID_Cliente = ?', id, (err, res) => {
+            if (err) {
+                result(err, null);
+                return;
+            }
+            if (res.affectedRows == 0) {
+                // Not found Cliente with the id
+                result({ kind: "not_found" }, null);
+                return;
+            }
+            result(null, res);
+        });
+    }
 };
 
-exports.getCliente = async (req, res) => {
-    Cliente.getById(req.params.id, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving the client."
-            });
-        } else {
-            res.send(data);
-        }
-    });
-};
-
-exports.createCliente = async (req, res) => {
-    Cliente.create(req.body, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while creating the client."
-            });
-        } else {
-            res.send(data);
-        }
-    });
-};
-
-exports.updateCliente = async (req, res) => {
-    Cliente.update(req.params.id, req.body, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while updating the client."
-            });
-        } else {
-            res.send(data);
-        }
-    });
-};
-
-exports.deleteCliente = async (req, res) => {
-    Cliente.delete(req.params.id, (err, data) => {
-        if (err) {
-            res.status(500).send({
-                message: err.message || "Some error occurred while deleting the client."
-            });
-        } else {
-            res.send({ message: "Client was deleted successfully!" });
-        }
-    });
-};
+module.exports = Cliente;

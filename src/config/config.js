@@ -4,7 +4,7 @@ const db = mysql.createConnection({
  port: '8081', // Puerto de tu base de datos
  user: 'root', 
  password: '24023', 
- database: 'motosce',
+ database: 'motoscev6',
  authPlugins : {
     mysql_clear_password: () => Buffer.from('24023','utf-8' ),
     caching_sha2_password : true,

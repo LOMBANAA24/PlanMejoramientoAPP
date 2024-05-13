@@ -1,10 +1,9 @@
-// authRoutes.js
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/AuthController');
-const { validateData } = require('../middlewares/validationMiddleware');
+const { validateLogin } = require('../middlewares/validationMiddleware');
 
 // Ruta para el inicio de sesión
-router.post('/login', validateData, authController.login);
+router.post('/login', validateLogin, authController.login);
 
 module.exports = router;
